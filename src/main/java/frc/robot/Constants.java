@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -29,10 +30,8 @@ public final class Constants {
 
     // Important locations for swerve
     public static final Translation2d m_standardCenterLocation = new Translation2d(0, 0);
-    public static final Translation2d m_frontLeftLocation = new Translation2d(chassisLength / 2.0,
-                    chassisWidth / 2.0);
-    public static final Translation2d m_frontRightLocation = new Translation2d(chassisLength / 2.0,
-                    -chassisWidth / 2.0);
+    public static final Translation2d m_frontLeftLocation = new Translation2d(chassisLength / 2.0, chassisWidth / 2.0);
+    public static final Translation2d m_frontRightLocation = new Translation2d(chassisLength / 2.0,-chassisWidth / 2.0);
     public static final Translation2d m_backLeftLocation = new Translation2d(-chassisLength / 2.0,
                     chassisWidth / 2.0);
     public static final Translation2d m_backRightLocation = new Translation2d(-chassisLength / 2.0,

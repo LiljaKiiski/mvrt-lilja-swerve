@@ -7,6 +7,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import frc.robot.Constants;
+import frc.robot.utils.TalonFactory;
+
 public class SwerveModule {
 
   private final BaseTalon driveMotor;
@@ -15,5 +18,6 @@ public class SwerveModule {
   /** Creates a new SwerveModule. */
   public SwerveModule() {
     driveMotor = TalonFactory.createTalonFX(driveID, driveReversed, Constants.SwerveDrivetrain.canivore_name);
+    turnMotor = TalonFactory.createTalonFX(turnID, turnReversed, Constants.SwerveDrivetrain.canivore_name);
   }
 }

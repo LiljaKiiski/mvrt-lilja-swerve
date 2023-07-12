@@ -4,12 +4,16 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDrivetrain extends SubsystemBase {
-  
+  SwerveModule[] modules;
+  SwerveDriveKinematics 
+
   /** Creates a new SwerveDrivetrain. */
   public SwerveDrivetrain() {
+    modules = new SwerveModule[4];
 
 
   }

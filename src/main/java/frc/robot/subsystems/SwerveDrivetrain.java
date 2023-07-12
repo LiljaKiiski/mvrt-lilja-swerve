@@ -235,4 +235,10 @@ public class SwerveDrivetrain extends SubsystemBase {
   public void toggleFieldOriented(){
     fieldOriented = !fieldOriented;
   }
+
+  public void stopModules() {
+    for (SwerveModule m : modules) {
+      m.disableModule();
+    }
+  }
 }

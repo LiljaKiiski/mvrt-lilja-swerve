@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivetrain;
@@ -34,8 +35,8 @@ public class SwerveJoystickCommand extends CommandBase {
   public SwerveJoystickCommand(
       SwerveDrivetrain drivetrain, 
       Supplier<Double> xSpeedFunc, Supplier<Double> ySpeedFunc, Supplier<Double> angularSpeedFunc, 
-      Trigger fieldOrientedFunc, JoystickIO joystick) {
-    
+      JoystickIO joystick) {  
+  
     //Set everything up
     this.drivetrain = drivetrain;
     this.xSpeedFunc = xSpeedFunc;
@@ -95,8 +96,7 @@ public class SwerveJoystickCommand extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-
-
+    drivetrain.stopModules();
   }
 
   // Returns true when the command should end.

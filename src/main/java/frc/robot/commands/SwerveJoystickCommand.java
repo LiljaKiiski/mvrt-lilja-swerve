@@ -4,20 +4,48 @@
 
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.SwerveDrivetrain;
+import frc.robot.utils.JoystickIO;
 
 public class SwerveJoystickCommand extends CommandBase {
-  
-  /** Creates a new SwerveJoystickCommand. */
-  public SwerveJoystickCommand() {
-    // Use addRequirements() here to declare subsystem dependencies.
+  //Pointer to drivetrain
+  private final SwerveDrivetrain drivetrain;
 
+  //Joystick
+  private final JoystickIO joystick;
+
+  //Suppliers to functions
+  private final Supplier<Double> xSpeedFunc;
+  private final Supplier<Double> ySpeedFunc;
+  private final Supplier<Double> turnSpeedFunc;
+
+  //Trigger to change orientation
+  private final Trigger fieldOrientedFunc;
+
+  /** Creates a new SwerveJoystickCommand. */
+  public SwerveJoystickCommand(
+      SwerveDrivetrain drivetrain, 
+      Supplier<Double> xSpeedFunc, Supplier<Double> ySpeedFunc, Supplier<Double> angularSpeedFunc, 
+      Trigger fieldOrientedFunc, JoystickIO joystick) {
+    
+    //Set everything up
+    this.drivetrain = drivetrain;
+    this.xSpeedFunc = xSpeedFunc;
+    this.ySpeedFunc = ySpeedFunc;
+    this.turnSpeedFunc = angularSpeedFunc;
+    this.fieldOrientedFunc = fieldOrientedFunc;
+
+    this.joystick = joystick;
+    addRequirements(drivetrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
 
   }
 

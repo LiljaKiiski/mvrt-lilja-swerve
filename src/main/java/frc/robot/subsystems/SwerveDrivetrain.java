@@ -8,6 +8,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -145,54 +146,49 @@ public class SwerveDrivetrain extends SubsystemBase {
   /**
    * Set modules states
    * Use horiz, vertical, and angular, and rotation point if robot oriented
-   * 
-   */
-  public void setSpeeds(double v_forwardMps, double v_sideMps, double v_rot) {
-
-    //Field oriented
-    if(isFieldOriented()){
-
-      
-    //Robot oriented
-    } else {
-
-    }
-
-    ChassisSpeeds speeds = new ChassisSpeeds(v_forwardMps, v_sideMps, v_rot);
-    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(speeds, Constants.SwerveDrivetrain.rotatePoints[0]);
-    setModuleStates(moduleStates);
-  }
-
-  /**
-   * Set modules states using speeds (horizontal, vertical and angular) as well as a rotation point
    * @param v_forwardMps
    * @param v_sideMps
    * @param v_rot (rad/sec)
-   * @param rotatePoint OPTIONAL!
    */
-  public void setSpeeds(double v_forwardMps, double v_sideMps, double v_rot, Translation2d rotatePoint) {
-    ChassisSpeeds speeds = new ChassisSpeeds(v_forwardMps, v_sideMps, v_rot);
-    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(speeds, rotatePoint);
-    setModuleStates(moduleStates);
+  public void setSpeeds(double v_forwardMps, double v_sideMps, double v_rot) {
+    //Field oriented
+    if(isFieldOriented()){
+
+      //If red aliance negate direction
+      if(DriverStation.getAlliance() == Alliance.Red) {
+        v_forwardMps = -v_forwardMps;
+        v_sideMps = -v_sideMps;
+      }
+
+      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(v_forwardMps, v_sideMps, v_rot, getPose().getRotation());
+      SwerveModuleState[] moduleStates = this.swerveKinematics.toSwerveModuleStates(speeds);
+      setModuleStates(moduleStates);
+
+    //Robot oriented
+    } else {
+      ChassisSpeeds speeds = new ChassisSpeeds(v_forwardMps, v_sideMps, v_rot);
+      SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(speeds, Constants.SwerveDrivetrain.rotatePoints[0]);
+      setModuleStates(moduleStates);
+    }
   }
 
   /**
-   * Set the speeds in field oriented (v_forward is the x direction, side is the y direction)
-   * @param v_forwardMps
-   * @param v_sideMps
-   * @param v_rot pos is counterclockwise, neg is clockwise
+   * Set all module states
+   * @param states
    */
-  public void setSpeedsFieldOriented(double v_forwardMps, double v_sideMps, double v_rot) {
-    //If red aliance negate direction
-    if(DriverStation.getAlliance() == Alliance.Red) {
-      v_forwardMps = -v_forwardMps;
-      v_sideMps = -v_sideMps;
+  public void setModuleStates(SwerveModuleState[] states) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.SwerveDrivetrain.kMaxSpeedMPS);
+    for (int i = 0; i < modules.length; i++){
+      modules[i].setDesiredState(states[i]);
     }
+  }
 
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(v_forwardMps, v_sideMps, v_rot, getPose().getRotation());
-    SmartDashboard.putString("ChassisSpeedsFO", speeds.toString());
-    SwerveModuleState[] moduleStates = this.swerveKinematics.toSwerveModuleStates(speeds);
-    setModuleStates(moduleStates);
+  /**
+   * Get the position of the robot
+   * @return Pose2d pose
+   */
+  public Pose2d getPose() {
+    return odometry.getPoseMeters();
   }
 
   public void zeroHeading() {

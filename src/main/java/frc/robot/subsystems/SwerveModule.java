@@ -34,9 +34,6 @@ public class SwerveModule {
   private final double encoderOffsetRad;
   private final CANCoder encoder;
 
-  //State TO reach
-  private SwerveModuleState desiredState;
-
   //Current position
   private SwerveModulePosition position;
 
@@ -64,7 +61,6 @@ public class SwerveModule {
     this.encoderOffsetRad = encoderOffsetRad;
     encoder = new CANCoder(encoderID, Constants.SwerveDrivetrain.canivore_name);
 
-    desiredState = new SwerveModuleState();
     this.name = "SwerveModule/" + name;
 
     resetEncoders();
@@ -215,19 +211,15 @@ public class SwerveModule {
   }
 
   /**
-   * Set mode
-   */
-  public void setMode(NeutralMode mode){
-    driveMotor.setNeutralMode(mode);
-    turnMotor.setNeutralMode(mode);
-  }
-
-  /**
    * Stop the module from running
    */
   public void disableModule() {
     driveMotor.set(ControlMode.PercentOutput, 0);
     turnMotor.set(ControlMode.PercentOutput, 0);
+  }
+  
+  public String getName(){
+    return name;
   }
 
   /**

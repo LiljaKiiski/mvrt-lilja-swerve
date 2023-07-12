@@ -27,9 +27,6 @@ public class SwerveJoystickCommand extends CommandBase {
   private final Supplier<Double> ySpeedFunc;
   private final Supplier<Double> turnSpeedFunc;
 
-  //Trigger to change orientation
-  private final Trigger fieldOrientedFunc;
-
   //Current heading (as a Rotation2d)
   private Rotation2d heading;
 
@@ -44,7 +41,6 @@ public class SwerveJoystickCommand extends CommandBase {
     this.xSpeedFunc = xSpeedFunc;
     this.ySpeedFunc = ySpeedFunc;
     this.turnSpeedFunc = angularSpeedFunc;
-    this.fieldOrientedFunc = fieldOrientedFunc;
 
     this.joystick = joystick;
     addRequirements(drivetrain);
@@ -80,6 +76,17 @@ public class SwerveJoystickCommand extends CommandBase {
 
     //Logging
     SmartDashboard.putBoolean("Field Oriented", drivetrain.isFieldOriented());
+
+    //Heading correction
+    // if (MathUtils.withinEpsilon(vW, 0, 0.01)) {
+    //   double v_w_compensate = drivetrain.holdHeading(heading);
+    //   vW += v_w_compensate;
+    //   SmartDashboard.putBoolean("Holding Heading", true);
+    // }
+    // else {
+    //   heading = drivetrain.getRotation2d();
+    //   SmartDashboard.putBoolean("Holding Heading", false);
+    // }
 
     //Update drivetrain speeds
     drivetrain.setSpeeds(vX, vY, vW);

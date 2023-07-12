@@ -116,9 +116,9 @@ public final class Constants {
     public static final double kMaxAutonDriveSpeed = 4; // Units: Mps
     public static final double kMaxAutonDriveAcceleration = 3; // Units: Mps2
     public static final double kMaxAutonThetaVelocity = 
-      kMaxAutonDriveSpeed / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // Rad ps
+      kMaxAutonDriveSpeed / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // Units: Rad ps
     public static final double kMaxAutonThetaAcceleration = 
-      kMaxAutonDriveAcceleration / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // Rad ps^2
+      kMaxAutonDriveAcceleration / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // Units: Rad ps^2
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = 
       new TrapezoidProfile.Constraints(kMaxAutonThetaVelocity, kMaxAutonThetaAcceleration);
@@ -126,12 +126,32 @@ public final class Constants {
     public static final double kTeleopHeadingCorrectionScale = 0;
   }
 
+  public static class SwerveModule {
+    //Wheel / gear ratios
+    public static final double gear_ratio_turn = 150.0 / 7.0; // number of rotations of talon for one turn of wheel
+    public static final double gear_ratio_drive = 6.75 / 1.0; // number of rotations of talon for one rotation of wheel
+    public static final double radius = 0.05; // Units: m
+    public static final double kwheelCircumference = 2 * Math.PI * radius; // Units: m
+
+    // PID Constants
+    public static final double kP = 0.1;;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kFF = 0;
+
+    public static final double kPTurn = 0.3;
+    public static final double kITurn = 0.0;
+    public static final double kDTurn = 0.0;
+    public static final double kFTurn = 0.0;
+}
+
   public static class Talon {
+    //Ticks
     public static final int talonFXTicks = 2048;
     public static final int talonSRXTicks = 4096;
 
+    //Other
     public static final double MAX_VOLTAGE = 10.0;
-
     public static final int kPIDIdx = 0;
     public static final int kTimeoutMs = 10;
     public static final double kVoltage = 10.0;

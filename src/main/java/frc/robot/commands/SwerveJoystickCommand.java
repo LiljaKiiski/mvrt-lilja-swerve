@@ -78,15 +78,11 @@ public class SwerveJoystickCommand extends CommandBase {
     //vY *=  Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
     //vW *= Constants.SwerveDrivetrain.kTurnMaxSpeedRPS;
 
+    //Logging
     SmartDashboard.putBoolean("Field Oriented", drivetrain.isFieldOriented());
 
-    if (drivetrain.isFieldOriented()) {
-      drivetrain.setSpeedsFieldOriented(vX, vY, vW);
-    }
-    else {
-      drivetrain.setSpeeds(vX, vY, vW, Constants.SwerveDrivetrain.rotatePoints[0]);
-    }
-
+    //Update drivetrain speeds
+    drivetrain.setSpeeds(vX, vY, vW);
   }
 
   // Called once the command ends or is interrupted.

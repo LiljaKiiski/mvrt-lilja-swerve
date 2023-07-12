@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDrivetrain extends SubsystemBase {
 
@@ -44,6 +46,7 @@ public class SwerveDrivetrain extends SubsystemBase {
   //Representation of field
   private Field2d field;
   private boolean fieldOriented = true;
+  private SwerveDriveOdometry odometry;
 
   //PID Controllers
   public PIDController xController;
@@ -134,6 +137,7 @@ public class SwerveDrivetrain extends SubsystemBase {
       Constants.SwerveDrivetrain.kMaxAutonDriveAcceleration);
     trajectoryConfig.setKinematics(swerveKinematics);
 
+    odometry = new SwerveDriveOdometry(swerveKinematics, getRotation2d(), modulePositions);
     field = new Field2d();
   }
 
@@ -141,6 +145,15 @@ public class SwerveDrivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    //Update odometry
+    odometry.update(getRotation2d(), modulePositions);
+
+    //Field update (log)
+    field.setRobotPose(
+      odometry.getPoseMeters().getX(),
+      odometry.getPoseMeters().getY(),
+      getRotation2d());
+      SmartDashboard.putData("Field", field);
   }
 
   /**

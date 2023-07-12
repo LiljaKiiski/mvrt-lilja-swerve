@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.utils.MathUtils;
 import frc.robot.utils.TalonFactory;
@@ -69,12 +72,118 @@ public class SwerveModule {
   }
 
   /**
+   * set the desired state of the module
+   * performs optimization based on currents state and velocity
+   * @param state
+   */
+  public void setDesiredState(SwerveModuleState state) {
+    //Stop module if too small change
+    if (Math.abs(state.speedMetersPerSecond) < 0.001) {
+      disableModule();
+      return;
+    }
+    SwerveModuleState optimized_state = optimize(state);
+    setRawState(optimized_state);
+    updatePosition();
+  }
+
+  /**
+   * sets the raw state of the module
+   * @param state
+   */
+  public void setRawState(SwerveModuleState state) {
+    setAngle(state.angle.getRadians());
+    setVelocity(state.speedMetersPerSecond);
+  }
+
+  /**
+   * set the angle of the turn motor
+   * 
+   * @param radians
+   */
+  private void setAngle(double radians) {
+    /*
+     * Reset integral accumulator
+     * It is sometimes desirable to clear the internal state 
+     * (most importantly, the integral accumulator) of a 
+     * PIDController, as it may be no longer valid (e.g. when
+     * the PIDController has been disabled and then re-enabled)
+     */
+    if (Math.abs(
+        MathUtils.ticksToRadians(turnMotor.getSelectedSensorPosition(),
+          Constants.Talon.talonFXTicks, 
+          Constants.SwerveModule.gear_ratio_turn)
+          - radians) < 3 * Math.PI / 180) {
+        turnMotor.setIntegralAccumulator(0);
+    }
+
+    //Set turn motor to angle
+    turnMotor.set(
+        ControlMode.Position,
+        MathUtils.radiansToTicks(
+          radians,
+          Constants.Talon.talonFXTicks,
+          Constants.SwerveModule.gear_ratio_turn));
+  }
+
+  /**
+   * set the velocity of the drive motor
+   * 
+   * @param v_mps
+   */
+  private void setVelocity(double v_mps) {
+    driveMotor.set(
+        ControlMode.Velocity,
+        MathUtils.rpmToTicks(
+            MathUtils.mpsToRPM(v_mps, Constants.SwerveModule.radius),
+            Constants.SwerveModule.gear_ratio_drive));
+  }
+
+  /**
+   * Update the module position for kinematics/odometry
+   */
+  public void updatePosition() {
+    Rotation2d angle = new Rotation2d(getTurnPosition());
+    double distance = getDrivePosition();
+    SmartDashboard.putString("Module Positions Values " + encoder.getDeviceID(), angle + " rad, " + distance + " meters");
+    position.angle = angle;
+    position.distanceMeters = distance;
+  }
+
+  /**
+   * Get the drive position of the module
+   * (aka how far module has driven)
+   * 
+   * @return the position, Units: meters
+   */
+  public double getDrivePosition() {
+    return MathUtils.ticksToMeter(
+      driveMotor.getSelectedSensorPosition(),
+      Constants.Talon.talonFXTicks,
+      Constants.SwerveModule.gear_ratio_drive,
+      Constants.SwerveModule.radius);
+  }
+
+  /**
+   * Get the turn position for the module
+   * (aka how much has turned)
+   * 
+   * This method is just for formality for now,
+   * does exact same as getRawEncoderRad()
+   * 
+   * @return the position in radians
+   */
+  public double getTurnPosition() {
+    return getRawEncoderRad();
+  }
+
+  /**
    * Reset encoders
    * Calibrate turn motor using encoder value
    */
   public void resetEncoders() {
    turnMotor.setSelectedSensorPosition(MathUtils.radiansToTicks(
-        getEncoderRad(), 
+        getAbsoluteEncoderRad(), 
         Constants.Talon.talonFXTicks, 
         Constants.SwerveModule.gear_ratio_turn)); 
   }
@@ -85,10 +194,78 @@ public class SwerveModule {
    * @return the angle of the swerve module 
    * (0 means forward with all screws facing left) CCW is positive
    */
-  public double getEncoderRad() {
+  public double getAbsoluteEncoderRad() {
     double angle = encoder.getAbsolutePosition();
     angle = Math.toRadians(angle);
     angle -= encoderOffsetRad;
     return angle * (encoderReversed ? -1.0 : 1.0);
+  }
+
+  /**
+   * Get the angle of the wheel based on the talonfx
+   * 0 is an arbitary position
+   * CCW is positive
+   * @return angle in rad
+   */
+  public double getRawEncoderRad() {
+    return MathUtils.ticksToRadians(
+      turnMotor.getSelectedSensorPosition(),
+        Constants.Talon.talonFXTicks,
+        Constants.SwerveModule.gear_ratio_turn);
+  }
+
+  /**
+   * Set mode
+   */
+  public void setMode(NeutralMode mode){
+    driveMotor.setNeutralMode(mode);
+    turnMotor.setNeutralMode(mode);
+  }
+
+  /**
+   * Stop the module from running
+   */
+  public void disableModule() {
+    driveMotor.set(ControlMode.PercentOutput, 0);
+    turnMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  /**
+   * Find the optimal angle for the module to go to (prevents it from ever
+   * rotating more than 90 degrees at a time)
+   * Full credits to Aman / Aakash for this method
+   * 
+   * @param state
+   * @return optimal state
+   */
+  public SwerveModuleState optimize(SwerveModuleState state) {
+    double targetAngle = state.angle.getDegrees();
+
+    targetAngle %= 360.0;
+    if (targetAngle < 0) {
+      targetAngle += 360;
+    }
+
+    double currentAngle = getRawEncoderRad() * 180.0 / Math.PI;
+    double currentAngleNormalized = currentAngle % 360.0;
+    double diff = targetAngle - currentAngleNormalized;
+    double targetVelocity = state.speedMetersPerSecond;
+
+    if (90.0 < Math.abs(diff) && Math.abs(diff) < 270.0) {
+      double beta = 180.0 - Math.abs(diff);
+      beta *= Math.signum(diff);
+      targetAngle = currentAngle - beta;
+      targetVelocity *= -1;
+    } else if (Math.abs(diff) >= 270.0) {
+      if (diff < 0)
+        targetAngle = currentAngle + (360.0 + diff);
+      else
+        targetAngle = currentAngle - (360.0 - diff);
+    } else {
+      targetAngle = currentAngle + diff;
+    }
+
+    SwerveModuleState newState = new SwerveModuleState(targetVelocity, new Rotation2d(targetAngle * Math.PI / 180.0));
+    return newState;
   }
 }

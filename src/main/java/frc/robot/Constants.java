@@ -35,6 +35,7 @@ public final class Constants {
     public static final Translation2d m_frontRightLocation = new Translation2d(chassisLength / 2.0, -chassisWidth / 2.0);
     public static final Translation2d m_backLeftLocation = new Translation2d(-chassisLength / 2.0, chassisWidth / 2.0);
     public static final Translation2d m_backRightLocation = new Translation2d(-chassisLength / 2.0, -chassisWidth / 2.0);
+    
     public static final Translation2d[] rotatePoints = {
                     m_standardCenterLocation,
                     m_frontLeftLocation,

@@ -8,12 +8,18 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class SwerveDrivetrain extends SubsystemBase {
@@ -36,7 +42,7 @@ public class SwerveDrivetrain extends SubsystemBase {
 
   //Representation of field
   private Field2d field;
-  public boolean fieldOriented = true;
+  private boolean fieldOriented = true;
 
   //PID Controllers
   public PIDController xController;
@@ -137,14 +143,68 @@ public class SwerveDrivetrain extends SubsystemBase {
   }
 
   /**
-   * Zero the gyro
+   * Set modules states
+   * Use horiz, vertical, and angular, and rotation point if robot oriented
+   * 
    */
-  public void zeroGyro() {
+  public void setSpeeds(double v_forwardMps, double v_sideMps, double v_rot) {
+
+    //Field oriented
+    if(isFieldOriented()){
+
+      
+    //Robot oriented
+    } else {
+
+    }
+
+    ChassisSpeeds speeds = new ChassisSpeeds(v_forwardMps, v_sideMps, v_rot);
+    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(speeds, Constants.SwerveDrivetrain.rotatePoints[0]);
+    setModuleStates(moduleStates);
+  }
+
+  /**
+   * Set modules states using speeds (horizontal, vertical and angular) as well as a rotation point
+   * @param v_forwardMps
+   * @param v_sideMps
+   * @param v_rot (rad/sec)
+   * @param rotatePoint OPTIONAL!
+   */
+  public void setSpeeds(double v_forwardMps, double v_sideMps, double v_rot, Translation2d rotatePoint) {
+    ChassisSpeeds speeds = new ChassisSpeeds(v_forwardMps, v_sideMps, v_rot);
+    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(speeds, rotatePoint);
+    setModuleStates(moduleStates);
+  }
+
+  /**
+   * Set the speeds in field oriented (v_forward is the x direction, side is the y direction)
+   * @param v_forwardMps
+   * @param v_sideMps
+   * @param v_rot pos is counterclockwise, neg is clockwise
+   */
+  public void setSpeedsFieldOriented(double v_forwardMps, double v_sideMps, double v_rot) {
+    //If red aliance negate direction
+    if(DriverStation.getAlliance() == Alliance.Red) {
+      v_forwardMps = -v_forwardMps;
+      v_sideMps = -v_sideMps;
+    }
+
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(v_forwardMps, v_sideMps, v_rot, getPose().getRotation());
+    SmartDashboard.putString("ChassisSpeedsFO", speeds.toString());
+    SwerveModuleState[] moduleStates = this.swerveKinematics.toSwerveModuleStates(speeds);
+    setModuleStates(moduleStates);
+  }
+
+  public void zeroHeading() {
     gyro.reset();
   }
 
-  public AHRS getGyro(){
-    return gyro;
+  /**
+   * Get the gyro angle as rotation2d
+   * @return Rotation2d heading
+   */
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getHeading());
   }
 
   /**
@@ -158,5 +218,13 @@ public class SwerveDrivetrain extends SubsystemBase {
    */
   public double getHeading() {
     return -Math.IEEEremainder(gyro.getYaw() - gyroOffset_deg, 360.0);
+  }
+
+  public boolean isFieldOriented(){
+    return fieldOriented;
+  }
+
+  public void toggleFieldOriented(){
+    fieldOriented = !fieldOriented;
   }
 }

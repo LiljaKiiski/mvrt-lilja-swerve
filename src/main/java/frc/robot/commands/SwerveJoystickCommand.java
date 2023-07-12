@@ -6,10 +6,14 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivetrain;
 import frc.robot.utils.JoystickIO;
+import frc.robot.utils.MathUtils;
 
 public class SwerveJoystickCommand extends CommandBase {
   //Pointer to drivetrain
@@ -25,6 +29,9 @@ public class SwerveJoystickCommand extends CommandBase {
 
   //Trigger to change orientation
   private final Trigger fieldOrientedFunc;
+
+  //Current heading (as a Rotation2d)
+  private Rotation2d heading;
 
   /** Creates a new SwerveJoystickCommand. */
   public SwerveJoystickCommand(
@@ -52,7 +59,33 @@ public class SwerveJoystickCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //Get values from joystick
+    double vX = xSpeedFunc.get(); // as of here, negative X is backwards, positive X is forward
+    double vY = ySpeedFunc.get(); // as of here, positive Y is left, negative Y is right
+    double vW = turnSpeedFunc.get(); // as of here, negative W is down (CW) positive W is up (CCW)
 
+    /*
+     * Deadbands are a common technique to sanitized joystick input
+     * and eliminate erroneous input
+     */
+    // apply deadband
+    vX = MathUtils.handleDeadband(vX, Constants.SwerveDrivetrain.kThrottleDeadband);
+    vY = MathUtils.handleDeadband(vY, Constants.SwerveDrivetrain.kThrottleDeadband);
+    vW = MathUtils.handleDeadband(vW, Constants.SwerveDrivetrain.kWheelDeadband);
+
+    // limit acceleration
+    //vX *= Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
+    //vY *=  Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
+    //vW *= Constants.SwerveDrivetrain.kTurnMaxSpeedRPS;
+
+    SmartDashboard.putBoolean("Field Oriented", drivetrain.isFieldOriented());
+
+    if (drivetrain.isFieldOriented()) {
+      drivetrain.setSpeedsFieldOriented(vX, vY, vW);
+    }
+    else {
+      drivetrain.setSpeeds(vX, vY, vW, Constants.SwerveDrivetrain.rotatePoints[0]);
+    }
 
   }
 

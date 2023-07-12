@@ -13,7 +13,7 @@ public class MathUtils {
      * @return finalInput input by the joystick after calculating deadband
      */
     public static double handleDeadband(double input, double inputDeadband) {
-        return (Math.abs(input) < inputDeadband)? 
+        return (Math.abs(input) < inputDeadband) ? 
             0.0 : 
             (input - inputDeadband * Math.signum(input)) / (1 - inputDeadband);
     }

@@ -69,9 +69,9 @@ public class SwerveJoystickCommand extends CommandBase {
     vW = MathUtils.handleDeadband(vW, Constants.SwerveDrivetrain.kWheelDeadband);
 
     // limit acceleration
-    //vX *= Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
-    //vY *=  Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
-    //vW *= Constants.SwerveDrivetrain.kTurnMaxSpeedRPS;
+    vX *= Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
+    vY *=  Constants.SwerveDrivetrain.kDriveMaxSpeedMPS;
+    vW *= Constants.SwerveDrivetrain.kTurnMaxSpeedRPS;
 
     //Logging
     SmartDashboard.putBoolean("Field Oriented", drivetrain.isFieldOriented());

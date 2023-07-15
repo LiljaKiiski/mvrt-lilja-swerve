@@ -196,6 +196,15 @@ public class SwerveDrivetrain extends SubsystemBase {
   }
 
   /**
+   * Reset the modules encoders
+   */
+  public void resetModules() {
+    for (SwerveModule m:modules) {
+      m.resetEncoders();
+    }
+  }
+
+  /**
    * Get the position of the robot
    * @return Pose2d pose
    */

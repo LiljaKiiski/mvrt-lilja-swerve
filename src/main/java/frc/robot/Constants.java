@@ -23,19 +23,22 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
-
   public static class SwerveDrivetrain {
     // Physical Constants
     public static final double chassisWidth = Units.inchesToMeters(26);
-    public static final double chassisLength = Units.inchesToMeters(28);
+    public static final double chassisLength = Units.inchesToMeters(28);// swap for comp
 
     // Important locations for swerve
+    // consider swapping corners
     public static final Translation2d m_standardCenterLocation = new Translation2d(0, 0);
-    public static final Translation2d m_frontLeftLocation = new Translation2d(chassisLength / 2.0, chassisWidth / 2.0);
-    public static final Translation2d m_frontRightLocation = new Translation2d(chassisLength / 2.0, -chassisWidth / 2.0);
-    public static final Translation2d m_backLeftLocation = new Translation2d(-chassisLength / 2.0, chassisWidth / 2.0);
-    public static final Translation2d m_backRightLocation = new Translation2d(-chassisLength / 2.0, -chassisWidth / 2.0);
-    
+    public static final Translation2d m_frontLeftLocation = new Translation2d(chassisLength / 2.0,
+                    chassisWidth / 2.0);
+    public static final Translation2d m_frontRightLocation = new Translation2d(chassisLength / 2.0,
+                    -chassisWidth / 2.0);
+    public static final Translation2d m_backLeftLocation = new Translation2d(-chassisLength / 2.0,
+                    chassisWidth / 2.0);
+    public static final Translation2d m_backRightLocation = new Translation2d(-chassisLength / 2.0,
+                    -chassisWidth / 2.0);
     public static final Translation2d[] rotatePoints = {
                     m_standardCenterLocation,
                     m_frontLeftLocation,
@@ -61,25 +64,42 @@ public final class Constants {
     public static final int m_backLeftEncoderID = 11;
     public static final int m_backRightEncoderID = 12;
 
-    // Encoder Offsets
-    public static final String canivore_name = "Drivetrain";
+    // Comp Bot Encoder Offsets
+    public static final boolean isCompBot = true;
+    public static final String canivore_name = (isCompBot)? "Drivetrain" : "rio";
 
-    public static final double m_frontLeftEncoderOffset = Units.degreesToRadians(221.04);
-    public static final double m_frontRightEncoderOffset = Units.degreesToRadians(273.42);
-    public static final double m_backLeftEncoderOffset = Units.degreesToRadians(213.398);
-    public static final double m_backRightEncoderOffset = Units.degreesToRadians(79.18);
+    public static final double m_frontLeftEncoderOffset_Comp = Units.degreesToRadians(221.04); // 128.32// + Math.PI/2.0;
+    public static final double m_frontRightEncoderOffset_Comp = Units.degreesToRadians(273.42); // 115.04// + Math.PI/2.0;
+    public static final double m_backLeftEncoderOffset_Comp = Units.degreesToRadians(213.398); //214.8 // + Math.PI/2.0;
+    public static final double m_backRightEncoderOffset_Comp = Units.degreesToRadians(79.18); // 341.81// + Math.PI/2.0;
 
-    // Constants for joystick
+    // Practice Bot Encoder Offsets
+    public static final double m_frontLeftEncoderOffset_P = Units.degreesToRadians(33.62);// + Math.PI/2.0;
+    public static final double m_frontRightEncoderOffset_P = Units.degreesToRadians(182.180);// + Math.PI/2.0;
+    public static final double m_backLeftEncoderOffset_P = Units.degreesToRadians(341.54);// + Math.PI/2.0;
+    public static final double m_backRightEncoderOffset_P = Units.degreesToRadians(146.86);// + Math.PI/2.0;
+
+    // Abs Encoder Offsets
+    public static final double m_frontLeftEncoderOffset = isCompBot ? m_frontLeftEncoderOffset_Comp
+                    : m_frontLeftEncoderOffset_P;// + Math.PI/2.0;
+    public static final double m_frontRightEncoderOffset = isCompBot ? m_frontRightEncoderOffset_Comp
+                    : m_frontRightEncoderOffset_P;// + Math.PI/2.0;
+    public static final double m_backLeftEncoderOffset = isCompBot ? m_backLeftEncoderOffset_Comp
+                    : m_backLeftEncoderOffset_P;// + Math.PI/2.0;
+    public static final double m_backRightEncoderOffset = isCompBot ? m_backRightEncoderOffset_Comp
+                    : m_backRightEncoderOffset_P;// + Math.PI/2.0;
+
+    // constants for joystick drive
     public static final double kSensitivity = 0.90;
     public static final double kWheelDeadband = 0.2;
     public static final double kThrottleDeadband = 0.2;
     public static final double kWheelGain = 0.05;
     public static final double kWheelNonlinearity = 0.05;
 
-    public static final double kMaxSpeedMPS = 10; // Optimize max speed to prioritize translation
+    public static final double kMaxSpeedMPS = 10; // optimize max speed to prioritize translation
     public static final double kDriveMaxAccelerationNormal = 3;
     public static final double kTurnMaxAccelerationNormal = 0.5 * Math.PI;
-    public static final double kDriveMaxSpeedMPSNormal = 3;
+    public static final double kDriveMaxSpeedMPSNormal = 3.5;
     public static final double kTurnMaxSpeedRPSNormal = 1 * Math.PI;
     public static final double kDriveMaxSpeedCap = 10;
     public static double kDriveMaxSpeedMPS = kDriveMaxSpeedMPSNormal;
@@ -95,38 +115,36 @@ public final class Constants {
     public static final int kDriveLeftTrigger = 2;
     public static final int kDriveRightTrigger = 3;
 
-    // Values to be determined after the robot is characterized
-    //public static final double kS = 0; //Units: Volts
-    //public static final double kV = 0; //Uunits: Volts * Seconds / Meters
-    //public static final double kA = 0; //Units: Volts * Seconds^2 / Meters
+    // values to be determined after the robot is characterized
+    public static final double kS = 0; // 0.69382 //units: Volts
+    public static final double kV = 0; // 1.30485 //2.6097 //units: Volts * Seconds / Meters
+    public static final double kA = 0; // 0.35228 //units: Volts * Seconds^2 / Meters
 
     // Position PID
     public static final double m_x_control_P = 1.6;
     public static final double m_x_control_I = 0.5;
     public static final double m_x_control_D = 0.0;
-
     public static final double m_y_control_P = 1.6;
     public static final double m_y_control_I = 0.5;
     public static final double m_y_control_D = 0.0;
-
     public static final double m_r_control_P = 2.0;
     public static final double m_r_control_I = 0.0;
     public static final double m_r_control_D = 0;
 
     // Auton Constants
-    public static final double kMaxAutonDriveSpeed = 4; // Units: Mps
-    public static final double kMaxAutonDriveAcceleration = 3; // Units: Mps2
-    public static final double kMaxAutonThetaVelocity = 
-      kMaxAutonDriveSpeed / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // Units: Rad ps
-    public static final double kMaxAutonThetaAcceleration = 
-      kMaxAutonDriveAcceleration / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // Units: Rad ps^2
+    public static final double kMaxAutonDriveSpeed = 4; // mps
+    public static final double kMaxAutonDriveAcceleration = 3; // mps2
+    public static final double kMaxAutonThetaVelocity = kMaxAutonDriveSpeed
+                    / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // rad ps
+    public static final double kMaxAutonThetaAcceleration = kMaxAutonDriveAcceleration
+                    / Math.hypot(chassisWidth / 2.0, chassisLength / 2.0); // rad ps^2
 
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = 
-      new TrapezoidProfile.Constraints(kMaxAutonThetaVelocity, kMaxAutonThetaAcceleration);
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+                    kMaxAutonThetaVelocity, kMaxAutonThetaAcceleration);
 
     public static final double kTeleopHeadingCorrectionScale = 0;
   }
-
+  
   public static class SwerveModule {
     //Wheel / gear ratios
     public static final double gear_ratio_turn = 150.0 / 7.0; // number of rotations of talon for one turn of wheel

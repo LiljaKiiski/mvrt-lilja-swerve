@@ -122,6 +122,13 @@ public class SwerveModule {
           Constants.SwerveModule.gear_ratio_turn));
   }
 
+   /**
+   * get the swerve module name (useful for SmartDashboard)
+   */
+  public void logMeasuredData() {
+  SmartDashboard.putNumber(name + "/OffsetCancoderDeg", getAbsoluteEncoderRad() * 180 / Math.PI);
+ }
+  
   /**
    * set the velocity of the drive motor
    * 

@@ -153,6 +153,11 @@ public class SwerveDrivetrain extends SubsystemBase {
       odometry.getPoseMeters().getY(),
       getRotation2d());
       SmartDashboard.putData("Field", field);
+
+    //Log stuff for each module
+    for (SwerveModule m: modules){
+      m.log();
+    }
   }
 
   /**

@@ -136,7 +136,7 @@ public class SwerveModule {
    /**
    * get the swerve module name (useful for SmartDashboard)
    */
-  public void logMeasuredData() {
+  public void log() {
     SmartDashboard.putNumber(name + "/OffsetCancoderDeg", getRawCanCoderOffset());
  }
   

@@ -122,11 +122,22 @@ public class SwerveModule {
           Constants.SwerveModule.gear_ratio_turn));
   }
 
+  /**
+   * Use method to get raw cancoder offset for module
+   * Turn all wheels with screws pointing left before using
+   * 
+   * @return in degrees offset
+   */
+
+  public double getRawCanCoderOffset(){
+    return encoder.getAbsolutePosition();
+  }
+
    /**
    * get the swerve module name (useful for SmartDashboard)
    */
   public void logMeasuredData() {
-  SmartDashboard.putNumber(name + "/OffsetCancoderDeg", getAbsoluteEncoderRad() * 180 / Math.PI);
+    SmartDashboard.putNumber(name + "/OffsetCancoderDeg", getRawCanCoderOffset());
  }
   
   /**

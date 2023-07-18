@@ -190,6 +190,17 @@ public class SwerveDrivetrain extends SubsystemBase {
   }
 
   /**
+   * Hold the current heading of the robot using PID
+   * @param heading the heading
+   * @return v_w new compensate
+   */
+  public double holdHeading(Rotation2d heading) {
+    double v_w = Constants.JoystickControls.kPJoystick * (heading.getRadians() - getRotation2d().getRadians());
+    // this.setSpeeds(0, 0, v_w, Constants.SwerveDrivetrain.rotatePoints[this.getRotationPointIdx()]);
+    return v_w;
+  }
+
+  /**
    * Set all module states
    * @param states
    */

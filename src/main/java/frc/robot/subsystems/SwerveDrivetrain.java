@@ -4,7 +4,12 @@
 
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -220,6 +226,30 @@ public class SwerveDrivetrain extends SubsystemBase {
     }
   }
 
+  public void resetModuleDrive() {
+    for (SwerveModule m:modules) {
+      m.resetDriveEncoders();
+    }
+  }
+
+  /**
+   * Set the modes
+   * @param mode the mode
+   */
+  public void setModes(NeutralMode mode){
+    for (SwerveModule m:modules) {
+      m.setMode(mode);
+    }
+  }
+
+  /**
+   * Reset the real odometry of the robot
+   * @param pose
+   */
+  public void resetOdometry(Pose2d pose) {
+    odometry.resetPosition(getRotation2d(), modulePositions, pose);
+  }
+
   /**
    * Get the position of the robot
    * @return Pose2d pose
@@ -273,5 +303,32 @@ public class SwerveDrivetrain extends SubsystemBase {
     for (SwerveModule m : modules) {
       m.disableModule();
     }
+  }
+
+  /**
+   * Give the autonbuilder for swerve
+   * @param eventMap the event map
+   * @return a new autonbuilder
+   */
+
+  public SwerveAutoBuilder getAutonBuilder(HashMap<String, Command> eventMap) {
+    return new SwerveAutoBuilder(
+      this::getPose,
+      this::resetFakeOdometry,
+      this.swerveKinematics, 
+      new PIDConstants(Constants.SwerveDrivetrain.m_x_control_P, Constants.SwerveDrivetrain.m_x_control_I, Constants.SwerveDrivetrain.m_x_control_D),
+      new PIDConstants(Constants.SwerveDrivetrain.m_r_control_P, Constants.SwerveDrivetrain.m_r_control_I, Constants.SwerveDrivetrain.m_r_control_D), 
+      this::setModuleStates,
+      eventMap, 
+      false,
+      this);
+  }
+
+  /**
+   * Does nothing
+   * @param pose NOTHING
+   */
+  private void resetFakeOdometry(Pose2d pose) {
+    return;
   }
 }

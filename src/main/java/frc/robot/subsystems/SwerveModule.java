@@ -202,6 +202,18 @@ public class SwerveModule {
         Constants.SwerveModule.gear_ratio_turn)); 
   }
 
+  public void resetDriveEncoders() {
+    driveMotor.setSelectedSensorPosition(0);
+  }
+
+  /**
+   * Set mode
+   */
+  public void setMode(NeutralMode mode){
+    driveMotor.setNeutralMode(mode);
+    turnMotor.setNeutralMode(mode);
+  }
+
   /**
    * Get the angle of the absolute encoder sensor on the module
    * 

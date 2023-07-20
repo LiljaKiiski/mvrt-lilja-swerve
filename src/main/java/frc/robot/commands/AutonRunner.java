@@ -13,7 +13,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -27,8 +26,8 @@ public class AutonRunner extends SequentialCommandGroup {
     Constants.SwerveDrivetrain.kMaxAutonDriveAcceleration);
 
   /** Creates a new AutonRunner. */
-  public AutonRunner(SwerveDrivetrain drivetrain, String pathName) {
-    this.drivetrain = drivetrain;
+  public AutonRunner(SwerveDrivetrain _drivetrain, String pathName) {
+    this.drivetrain = _drivetrain;
     addRequirements(drivetrain);
 
     trajectory = PathPlanner.loadPath(

@@ -241,6 +241,14 @@ public class SwerveDrivetrain extends SubsystemBase {
   }
 
   /**
+   * Get the field
+   * @return Field2d field
+   */
+  public Field2d getField() {
+    return field;
+  }
+
+  /**
    * Get heading of gyro
    * use IEEEremainder because it uses formula:
    * dividend - (divisor x Math.Round(dividend / divisor))

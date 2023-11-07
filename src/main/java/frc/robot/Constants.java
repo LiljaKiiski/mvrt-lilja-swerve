@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
+import edu.wpi.first.wpilibj.RobotBase;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -30,8 +32,16 @@ public final class Constants {
     public static final double kIJoystick = 0.0;
     public static final double kDJoystick = 0.0;
     public static final double kFJoystick = 0.0;
+  }
 
-}
+  public static class DataLogging {
+    public static final Mode currMode = RobotBase.isSimulation() ? Mode.SIM : Mode.REAL;
+
+    public static enum Mode {
+            REAL, REPLAY, SIM
+    }
+  }
+
   public static class SwerveDrivetrain {
     // Physical Constants
     public static final double chassisWidth = Units.inchesToMeters(26);

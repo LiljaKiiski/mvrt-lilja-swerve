@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.sensors.CANCoder;
 
@@ -21,6 +22,9 @@ public class SwerveModule {
   //Motors
   private final BaseTalon driveMotor;
   private final BaseTalon turnMotor;
+
+  private TalonFXSimCollection driveMotorSim = null;
+  private TalonFXSimCollection turnMotorSim = null;
 
   //Name
   private final String name;

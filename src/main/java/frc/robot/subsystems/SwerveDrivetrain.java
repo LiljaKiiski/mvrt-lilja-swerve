@@ -178,7 +178,7 @@ public class SwerveDrivetrain extends SubsystemBase {
     if(isFieldOriented()){
 
       //If red aliance negate direction
-      if(DriverStation.getAlliance() == Alliance.Red) {
+      if(DriverStation.getAlliance().get() == Alliance.Red) {
         v_forwardMps = -v_forwardMps;
         v_sideMps = -v_sideMps;
       }
